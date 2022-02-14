@@ -1,6 +1,6 @@
 # ma2tl (mac_apt to timeline)
 
-This is a DFIR tool for generating a forensic timeline from the analysis result DBs of [mac_apt](https://github.com/ydkhatri/mac_apt).
+This is a DFIR tool for generating a macOS forensic timeline from the analysis result DBs of [mac_apt](https://github.com/ydkhatri/mac_apt).
 
 ## Requirements
 
@@ -58,7 +58,7 @@ The following 4 plugins are available:
 
 ## Presentation
 
-This tool has been published this tool on [Japan Security Analyst Conference 2022](https://jsac.jpcert.or.jp/en/index.html) (JSAC2022).
+This tool was published on [Japan Security Analyst Conference 2022](https://jsac.jpcert.or.jp/en/index.html) (JSAC2022).
 
 Slides are available below:
 

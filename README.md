@@ -9,6 +9,8 @@ This is a DFIR tool for generating a macOS forensic timeline from the analysis r
 - tzlocal
 - xlsxwriter
 
+Run pip install -r requirements.txt to install the dependencies.
+
 ## Installation
 
 ```Shell

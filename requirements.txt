@@ -1,0 +1,3 @@
+xlsxwriter
+pytz
+tzlocal

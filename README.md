@@ -56,6 +56,9 @@ The following 4 plugins are available:
 ![Scenario](images/demo_scenario.png)
 ![Timeline](images/demo_timeline.png)
 
+## Notes
+Unfortunately, the latest version of mac_apt cannot parse Unified Logs files correctly. So you have to replace UnifiedLogs.db with a database created by [helper tools](https://github.com/mnrkbys/ma2tl/tree/main/helper_tools).
+
 ## Presentation
 
 This tool was published on [Japan Security Analyst Conference 2022](https://jsac.jpcert.or.jp/en/index.html) (JSAC2022).

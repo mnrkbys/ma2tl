@@ -10,14 +10,14 @@ eul2madb uses macos-UnifiedLogs as a library and can convert the exported Unifie
 
 ### Building eul2madb
 
-``` zsh
+```zsh
 % cd eul2madb
 % cargo build --release
 ```
 
 ### Help of eul2madb
 
-``` zsh
+```zsh
 % ./target/release/eul2madb -h
 Exported Unified Logs converter
 
@@ -33,7 +33,7 @@ Options:
 
 ### How to run eul2madb
 
-``` zsh
+```zsh
 % ./target/release/eul2madb --input ~/Desktop/unifiedlogs/ --output-format sqlite --output UnifiedLogs.db 
 zsh: no matches found: UnifiedLogs.db*
 Staring Unified Logs converter...
@@ -51,13 +51,13 @@ Actually, the log command of macOS can display log entries as ndjson with a lot 
 
 ### Installing required packages
 
-``` zsh
+```zsh
 % pip3 install ndjson
 ```
 
 ### Help of ndjson2madb.py
 
-``` zsh
+```zsh
 % python3 ./ndjson2madb.py -h
 usage: ndjson2madb.py [-h] [-i INPUT] -o OUTPUT
 
@@ -75,7 +75,7 @@ Exporting all entries of Unified Logs takes a lot of disk space. I recommend usi
 % log show --info --debug --style ndjson --timezone 'UTC' | zip ~/Desktop/unifiedlogs_ndjson.zip -
 
 Zipped file can be converted to a database like below:
-% unzip -q -c ~/Desktop/unifiedlogs_ndjson.zip | python3 ./ndjson2ma.py -o ./UnifiedLogs_.db
+% unzip -q -c ~/Desktop/unifiedlogs_ndjson.zip | python3 ./ndjson2ma.py -o ./UnifiedLogs.db
 
 [Timezone]
 This script does NOT consider timezone. So, you need to run the log command like below:
@@ -86,5 +86,5 @@ This script does NOT consider timezone. So, you need to run the log command like
 
 ```
 % log show --info --debug --style ndjson --timezone 'UTC' | zip ~/Desktop/unifiedlogs_ndjson.zip -
-% unzip -q -c ~/Desktop/unifiedlogs_ndjson.zip | python3 ./ndjson2ma.py -o ./UnifiedLogs_.db
+% unzip -q -c ~/Desktop/unifiedlogs_ndjson.zip | python3 ./ndjson2ma.py -o ./UnifiedLogs.db
 ```

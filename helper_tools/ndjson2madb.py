@@ -127,7 +127,7 @@ def parse_arguments() -> argparse.ArgumentParser:
         + "Exporting all entries of Unified Logs takes a lot of disk space. I recommend using zip command along with to reduce the file size.\n"
         + "% log show --info --debug --style ndjson --timezone 'UTC' | zip ~/Desktop/unifiedlogs_ndjson.zip -\n\n"
         + "Zipped file can be converted to a database like below:\n"
-        + "% unzip -q -c ~/Desktop/unifiedlogs_ndjson.zip | python3 ./ndjson2ma.py -o ./UnifiedLogs_.db\n"
+        + "% unzip -q -c ~/Desktop/unifiedlogs_ndjson.zip | python3 ./ndjson2ma.py -o ./UnifiedLogs.db\n"
         + "\n\n"
         + "[Timezone]\n"
         + "This script does NOT consider timezone. So, you need to run the log command like below:\n"

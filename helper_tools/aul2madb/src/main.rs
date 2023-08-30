@@ -15,7 +15,7 @@
 //
 
 //
-// The parse_trace_file() function is borrowed from unifiedlog_parser.
+// parse_log_archive() and parse_trace_file() are borrowed from macos-UnifiedLogs' unifiedlog_parser.
 // https://github.com/mandiant/macos-UnifiedLogs/blob/main/examples/unifiedlog_parser/src/main.rs
 //
 
@@ -34,14 +34,15 @@ use simplelog::{Config, SimpleLogger};
 use std::error::Error;
 use std::fs;
 use std::fs::OpenOptions;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::process;
 // use log::LevelFilter;
 
 #[derive(Parser, Debug)]
 // #[clap(version, about, long_about = None)]
 #[command(version, about, long_about = None)]
 struct Args {
-    /// Path to a directory which contains exported Unified Logs
+    /// Path to a logarchive or to a directory that contains exported Unified Logs
     #[clap(short, long)]
     input: String,
 
@@ -51,7 +52,7 @@ struct Args {
     output_format: OutputFormat,
 
     /// Path to output file
-    #[clap(short, long, default_value = "UnifiedLogs.db")]
+    #[clap(short, long, default_value = "./UnifiedLogs.db")]
     output: String,
 }
 
@@ -68,12 +69,44 @@ fn main() {
 
     let _args = Args::parse();
 
+    // let input_path = Path::new(&_args.input).canonicalize().unwrap();
+    let input_path = dunce::canonicalize(Path::new(&_args.input)).unwrap();
+    // let output_path = Path::new(&_args.output).canonicalize().unwrap();
+    // let output_path = dunce::canonicalize(Path::new(&_args.output)).unwrap();
+    let output_path = Path::new(&_args.output);
+
+    if !input_path.is_dir() {
+        println!(
+            "{} is not a logarchive or a directory.",
+            &input_path.display()
+        );
+        process::exit(1);
+    }
+
+    if output_path.is_file() {
+        println!("{} has been exist.", &output_path.display());
+        process::exit(1);
+    }
+
     println!("Staring Unified Logs converter...");
 
     output_header().unwrap();
-    parse_exported_logs(&_args.input);
 
-    println!("Finished...")
+    if input_path.display().to_string().ends_with(".logarchive") {
+        println!("Processing as a logarchive.");
+        // parse_log_archive(&_args.input);
+        parse_log_archive(&input_path.display().to_string());
+    } else {
+        println!("Processing as exported Unified Logs.");
+        // parse_exported_logs(&_args.input);
+        parse_exported_logs(&input_path.display().to_string());
+    }
+
+    // println!("Finished...")
+    println!(
+        "\nFinished parsing Unified Log data. Saved results to: {}",
+        &output_path.display()
+    );
 }
 
 fn parse_exported_logs(path: &str) {
@@ -99,6 +132,36 @@ fn parse_exported_logs(path: &str) {
         &timesync_data,
         &exported_path.display().to_string(),
     );
+}
+
+// Parse a provided directory path. Currently expect the path to follow macOS log collect structure
+fn parse_log_archive(path: &str) {
+    let mut archive_path = PathBuf::from(path);
+
+    // Parse all UUID files which contain strings and other metadata
+    let string_results = collect_strings(&archive_path.display().to_string()).unwrap();
+
+    archive_path.push("dsc");
+    // Parse UUID cache files which also contain strings and other metadata
+    let shared_strings_results =
+        collect_shared_strings(&archive_path.display().to_string()).unwrap();
+    archive_path.pop();
+
+    archive_path.push("timesync");
+    // Parse all timesync files
+    let timesync_data = collect_timesync(&archive_path.display().to_string()).unwrap();
+    archive_path.pop();
+
+    // Keep UUID, UUID cache, timesync files in memory while we parse all tracev3 files
+    // Allows for faster lookups
+    parse_trace_file(
+        &string_results,
+        &shared_strings_results,
+        &timesync_data,
+        path,
+    );
+
+    // println!("\nFinished parsing Unified Log data. Saved results to: output.csv");
 }
 
 // Use the provided strings, shared strings, timesync data to parse the Unified Log data at provided path.

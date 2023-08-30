@@ -2,46 +2,46 @@
 
 Unfortunately, the current version of mac_apt is not able to parse Unified Logs correctly since macOS 11. However, there are several measures against this problem.
 
-## Measure 1 (eul2madb)
+## Measure 1 (aul2madb)
 
 As mentioned above, the current version of mac_apt cannot parse Unified Logs. On the other hand, exporting Unified Logs can be done correctly. So, we can parse the exported Unified Logs with other tools. For example, [macos-UnifiedLogs](https://github.com/mandiant/macos-UnifiedLogs) can parse them which come from macOS 10.12 or later.
 
-eul2madb uses macos-UnifiedLogs as a library and can convert the exported Unified Logs by mac_apt to the database in the same format as mac_apt. macos-UnifiedLogs is written in Rust. Therefore, this tool is also written in Rust, not Python.
+aul2madb uses macos-UnifiedLogs as a library and can convert the exported Unified Logs by mac_apt to the database in the same format as mac_apt. macos-UnifiedLogs is written in Rust. Therefore, this tool is also written in Rust, not Python.
 
-### Building eul2madb
+### Building aul2madb
 
 ```zsh
-% cd eul2madb
+% cd aul2madb
 % cargo build --release
 ```
 
-### Help of eul2madb
+### Help of aul2madb
 
 ```zsh
-% ./target/release/eul2madb -h
-Exported Unified Logs converter
+% ./target/release/aul2madb -h
+Unified Logs converter for ma2tl
 
-Usage: eul2madb [OPTIONS] --input <INPUT>
+Usage: aul2madb [OPTIONS] --input <INPUT>
 
 Options:
-  -i, --input <INPUT>                  Path to a directory which contains exported Unified Logs
+  -i, --input <INPUT>                  Path to a logarchive or to a directory that contains exported Unified Logs
   -f, --output-format <OUTPUT_FORMAT>  Output format [default: sqlite] [possible values: sqlite, tsv]
-  -o, --output <OUTPUT>                Path to output file [default: UnifiedLogs.db]
+  -o, --output <OUTPUT>                Path to output file [default: ./UnifiedLogs.db]
   -h, --help                           Print help
   -V, --version                        Print version
 ```
 
-### How to run eul2madb
+### How to run aul2madb
 
 ```zsh
-% ./target/release/eul2madb --input ~/Desktop/unifiedlogs/ --output-format sqlite --output UnifiedLogs.db 
-zsh: no matches found: UnifiedLogs.db*
+% ./target/release/aul2madb --input ~/Desktop/system_logs.logarchive --output-format sqlite --output UnifiedLogs.db
 Staring Unified Logs converter...
-Parsing: /Users/macforensics/Desktop/unifiedlogs/diagnostics/Persist/0000000000000749.tracev3
-Parsing: /Users/macforensics/Desktop/unifiedlogs/diagnostics/Persist/0000000000000759.tracev3
-Parsing: /Users/macforensics/Desktop/unifiedlogs/diagnostics/Persist/0000000000000732.tracev3
-Parsing: /Users/macforensics/Desktop/unifiedlogs/diagnostics/Persist/0000000000000750.tracev3
-Parsing: /Users/macforensics/Desktop/unifiedlogs/diagnostics/Persist/0000000000000740.tracev3
+Processing as a logarchive.
+Parsing: /Users/macforensics/Desktop/system_logs.logarchive/Persist/0000000000000fbf.tracev3
+Parsing: /Users/macforensics/Desktop/system_logs.logarchive/Persist/0000000000000fcf.tracev3
+Parsing: /Users/macforensics/Desktop/system_logs.logarchive/Persist/0000000000000fa9.tracev3
+Parsing: /Users/macforensics/Desktop/system_logs.logarchive/Persist/0000000000000fd4.tracev3
+Parsing: /Users/macforensics/Desktop/system_logs.logarchive/Persist/0000000000000fb6.tracev3
 (snip)
 ```
 

@@ -93,6 +93,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "aul2madb"
+version = "0.0.2"
+dependencies = [
+ "chrono",
+ "clap",
+ "csv",
+ "dunce",
+ "macos-unifiedlogs",
+ "rusqlite",
+ "simplelog",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -231,6 +244,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dunce"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56ce8c6da7551ec6c462cbaf3bfbc75131ebbfa1c944aeaa9dab51ca1c5f0c3b"
+
+[[package]]
 name = "errno"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -249,18 +268,6 @@ checksum = "aa68f1b12764fab894d2755d2518754e71b4fd80ecfb822714a1206c2aab39bf"
 dependencies = [
  "cc",
  "libc",
-]
-
-[[package]]
-name = "eul2madb"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "clap",
- "csv",
- "macos-unifiedlogs",
- "rusqlite",
- "simplelog",
 ]
 
 [[package]]

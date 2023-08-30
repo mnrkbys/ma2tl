@@ -6,7 +6,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2021 Minoru Kobayashi <unknownbit@gmail.com> (@unkn0wnbit)
+# Copyright (c) 2021-2023 Minoru Kobayashi <unknownbit@gmail.com> (@unkn0wnbit)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@
 # SOFTWARE.
 #
 
+from __future__ import annotations
+
 import argparse
 import glob
 import logging
@@ -43,10 +45,10 @@ from plugins.helpers.plugin import (check_user_specified_plugin_name,
                                     import_plugins, setup_logger)
 
 log = None
-MA2TL_VERSION = '20220214'
+MA2TL_VERSION = '20230830'
 
 
-def parse_arguments(plugins):
+def parse_arguments(plugins: list) -> argparse.ArgumentParser:
     plugin_name_list = ['ALL']
     plugins_info = f"The following {len(plugins)} plugins are available:"
 
@@ -61,12 +63,13 @@ def parse_arguments(plugins):
                                     description='Forensic timeline generator using mac_apt analysis results. Supports only SQLite DBs.',
                                     epilog=plugins_info, formatter_class=argparse.RawTextHelpFormatter
                                     )
-    parser.add_argument('-i', '--input', action='store', default=None, help='Path to a folder that contains mac_apt DBs.')
-    parser.add_argument('-o', '--output', action='store', default=None, help='Path to a folder to save ma2tl result.')
+    parser.add_argument('-i', '--input', action='store', default=None, help='Path to a folder that contains mac_apt DBs')
+    parser.add_argument('-o', '--output', action='store', default=None, help='Path to a folder to save ma2tl result')
     parser.add_argument('-ot', '--output_type', action='store', default='SQLITE', help='Specify the output file type: SQLITE, XLSX, TSV (Default: SQLITE)')
     # parser.add_argument('-f', '--force', action='store_true', default=False, help='Overwrite an output file.')
-    parser.add_argument('-s', '--start', action='store', default=None, help='Specify start timestamp. (ex. 2021-11-05 08:30:00)')
-    parser.add_argument('-e', '--end', action='store', default=None, help='Specify end timestamp.')
+    # parser.add_argument('-u', '--unifiedlogs_only', action='store_true', default=False, help='Analyze UnifiedLogs.db only (Default: False)')
+    parser.add_argument('-s', '--start', action='store', default=None, help='Specify start timestamp (ex. 2021-11-05 08:30:00)')
+    parser.add_argument('-e', '--end', action='store', default=None, help='Specify end timestamp')
     parser.add_argument('-t', '--timezone', action='store', default=None, help='Specify Timezone: "UTC", "Asia/Tokyo", "US/Eastern", etc (Default: System Local Timezone)')
     parser.add_argument('-l', '--log_level', action='store', default='INFO', help='Specify log level: INFO, DEBUG, WARNING, ERROR, CRITICAL (Default: INFO)')
     parser.add_argument('plugin', nargs="+", help="Plugins to run (space separated).")
@@ -79,7 +82,7 @@ def expand_to_abspath(path):
     return os.path.abspath(path)
 
 
-def check_input_path(input_path, macapt_dbs):
+def check_input_path(input_path: str, macapt_dbs: basicinfo.MacAptDbs) -> bool:
     try:
         if os.path.isdir(input_path):
             db_list = glob.glob(os.path.join(input_path, '*.db'))
@@ -91,12 +94,14 @@ def check_input_path(input_path, macapt_dbs):
                         macapt_dbs.unifiedlogs_db_path = db_path
                     elif re.match(r'APFS_Volumes_\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\.db', os.path.basename(db_path)):
                         macapt_dbs.apfs_volumes_db_path = db_path
-                if macapt_dbs.mac_apt_db_path and macapt_dbs.unifiedlogs_db_path and macapt_dbs.apfs_volumes_db_path:
+                # if macapt_dbs.mac_apt_db_path and macapt_dbs.unifiedlogs_db_path and macapt_dbs.apfs_volumes_db_path:
+                if macapt_dbs.mac_apt_db_path or macapt_dbs.unifiedlogs_db_path or macapt_dbs.apfs_volumes_db_path:
                     return True
-            else:
-                print("Error: mac_apt analysis result DBs are insufficient.")
-                return False
+            # else:
+            print("Error: mac_apt analysis result DBs are insufficient.")
+            return False
         else:
+            print("Error: the input path is not a directory.")
             return False
 
     except Exception as ex:

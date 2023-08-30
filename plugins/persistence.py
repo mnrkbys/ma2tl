@@ -1,20 +1,23 @@
 #
-#    Copyright (c) 2021 Minoru Kobayashi
+#    Copyright (c) 2021-2023 Minoru Kobayashi
 #
 #    This file is part of ma2tl.
 #    Usage or distribution of this code is subject to the terms of the MIT License.
 #
 
+from __future__ import annotations
+
 import datetime
 import logging
 import os
 
-from plugins.helpers.basic_info import MacAptDBType
+from plugins.helpers.basic_info import BasicInfo, MacAptDBType
 from plugins.helpers.common import convert_apfs_time
 
 PLUGIN_NAME = os.path.splitext(os.path.basename(__file__))[0].upper()
 PLUGIN_DESCRIPTION = "Extract persistence settings."
 PLUGIN_ACTIVITY_TYPE = "Persistence"
+PLUGIN_VERSION = "20230830"
 PLUGIN_AUTHOR = "Minoru Kobayashi"
 PLUGIN_AUTHOR_EMAIL = "unknownbit@gmail.com"
 
@@ -68,7 +71,10 @@ def _check_between_ts(check_ts, start_ts, end_ts):
         return False
 
 
-def extract_autostart(basic_info, timeline_events):
+def extract_autostart(basic_info: BasicInfo, timeline_events: list) -> bool:
+    if not basic_info.mac_apt_dbs.has_dbs(MacAptDBType.MACAPT_DB | MacAptDBType.APFS_VOLUMES):
+        return False
+
     run_query = basic_info.mac_apt_dbs.run_query
     start_ts, end_ts = basic_info.get_between_dates_utc()
     sql_users = 'SELECT Username, UID FROM Users;'
@@ -138,7 +144,7 @@ def extract_autostart(basic_info, timeline_events):
     return True
 
 
-def run(basic_info):
+def run(basic_info: BasicInfo) -> bool:
     global log
     log = logging.getLogger(basic_info.output_params.logger_root + '.PLUGINS.' + PLUGIN_NAME)
     timeline_events = []

@@ -1,19 +1,22 @@
 #
-#    Copyright (c) 2021 Minoru Kobayashi
+#    Copyright (c) 2021-2023 Minoru Kobayashi
 #
 #    This file is part of ma2tl.
 #    Usage or distribution of this code is subject to the terms of the MIT License.
 #
 
+from __future__ import annotations
+
 import logging
 import os
 
-from plugins.helpers.basic_info import MacAptDBType
+from plugins.helpers.basic_info import BasicInfo, MacAptDBType
 from plugins.helpers.common import get_timedelta
 
 PLUGIN_NAME = os.path.splitext(os.path.basename(__file__))[0].upper()
 PLUGIN_DESCRIPTION = "Extract file download activities."
 PLUGIN_ACTIVITY_TYPE = "File Download"
+PLUGIN_VERSION = "20230830"
 PLUGIN_AUTHOR = "Minoru Kobayashi"
 PLUGIN_AUTHOR_EMAIL = "unknownbit@gmail.com"
 
@@ -29,7 +32,10 @@ class FileDownloadEvent:
         self.agent = agent
 
 
-def extract_spotlight_dataview_file_download(basic_info, filedownload_events):
+def extract_spotlight_dataview_file_download(basic_info: BasicInfo, filedownload_events: list) -> bool:
+    if not basic_info.mac_apt_dbs.has_dbs(MacAptDBType.MACAPT_DB):
+        return False
+
     run_query = basic_info.mac_apt_dbs.run_query
     sql = 'SELECT * FROM "{}" WHERE kMDItemDownloadedDate BETWEEN "{}" AND "{}" \
             ORDER BY kMDItemDownloadedDate;'
@@ -72,7 +78,10 @@ def extract_spotlight_dataview_file_download(basic_info, filedownload_events):
     return True
 
 
-def extract_safari_quarantine_file_download(basic_info, filedownload_events):
+def extract_safari_quarantine_file_download(basic_info: BasicInfo, filedownload_events: list) -> bool:
+    if not basic_info.mac_apt_dbs.has_dbs(MacAptDBType.MACAPT_DB):
+        return False
+
     run_query = basic_info.mac_apt_dbs.run_query
     start_ts, end_ts = basic_info.get_between_dates_utc()
     sql = f'SELECT Quarantine.TimeStamp, Quarantine.AgentName, Quarantine.DataUrl, Quarantine.OriginUrl, Safari.Other_Info FROM Quarantine \
@@ -104,7 +113,10 @@ def extract_safari_quarantine_file_download(basic_info, filedownload_events):
     return True
 
 
-def extract_chrome_file_download(basic_info, filedownload_events):
+def extract_chrome_file_download(basic_info: BasicInfo, filedownload_events: list) -> bool:
+    if not basic_info.mac_apt_dbs.has_dbs(MacAptDBType.MACAPT_DB):
+        return False
+
     table_name = 'Chrome'
     if not basic_info.mac_apt_dbs.is_table_exist(MacAptDBType.MACAPT_DB, table_name):
         log.info(f"{table_name} table does not exist.")
@@ -125,7 +137,10 @@ def extract_chrome_file_download(basic_info, filedownload_events):
     return True
 
 
-def extract_quarantine_file_download(basic_info, filedownload_events):
+def extract_quarantine_file_download(basic_info: BasicInfo, filedownload_events: list) -> bool:
+    if not basic_info.mac_apt_dbs.has_dbs(MacAptDBType.MACAPT_DB):
+        return False
+
     run_query = basic_info.mac_apt_dbs.run_query
     start_ts, end_ts = basic_info.get_between_dates_utc()
     sql = f'SELECT TimeStamp, AgentName, DataUrl, OriginUrl FROM Quarantine \
@@ -155,7 +170,7 @@ def extract_quarantine_file_download(basic_info, filedownload_events):
     return True
 
 
-def run(basic_info):
+def run(basic_info: BasicInfo) -> bool:
     global log
     log = logging.getLogger(basic_info.output_params.logger_root + '.PLUGINS.' + PLUGIN_NAME)
     timeline_events = []

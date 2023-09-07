@@ -71,8 +71,6 @@ fn main() {
 
     // let input_path = Path::new(&_args.input).canonicalize().unwrap();
     let input_path = dunce::canonicalize(Path::new(&_args.input)).unwrap();
-    // let output_path = Path::new(&_args.output).canonicalize().unwrap();
-    // let output_path = dunce::canonicalize(Path::new(&_args.output)).unwrap();
     let output_path = Path::new(&_args.output);
 
     if !input_path.is_dir() {
@@ -94,15 +92,12 @@ fn main() {
 
     if input_path.display().to_string().ends_with(".logarchive") {
         println!("Processing as a logarchive.");
-        // parse_log_archive(&_args.input);
         parse_log_archive(&input_path.display().to_string());
     } else {
         println!("Processing as exported Unified Logs.");
-        // parse_exported_logs(&_args.input);
         parse_exported_logs(&input_path.display().to_string());
     }
 
-    // println!("Finished...")
     println!(
         "\nFinished parsing Unified Log data. Saved results to: {}",
         &output_path.display()
@@ -415,7 +410,6 @@ fn output_header() -> Result<(), Box<dyn Error>> {
 
 fn output_header_sqlite(path: &str) -> Result<(), Box<dyn Error>> {
     let conn = Connection::open(path)?;
-    // conn.execute_batch("PRAGMA journal_mode=WAL")?;
     conn.pragma_update(None, "journal_mode", &"WAL")?;
     conn.execute(
         "CREATE TABLE UnifiedLogs (
@@ -511,11 +505,7 @@ fn output(results: &Vec<LogData>) -> Result<(), Box<dyn Error>> {
 }
 
 fn output_sqlite(path: &str, results: &Vec<LogData>) -> Result<(), Box<dyn Error>> {
-    // let mut conn = Connection::open(path)?;
     let conn = Connection::open(path)?;
-    // conn.execute_batch("PRAGMA journal_mode=WAL")?;
-    // let tx = conn.transaction().unwrap();
-    // let mut stmt = &tx.prepare("INSERT INTO UnifiedLogs (
     let mut stmt = conn.prepare("INSERT INTO UnifiedLogs (
                                                 File, \
                                                 DecompFilePos, \
@@ -580,60 +570,6 @@ fn output_sqlite(path: &str, results: &Vec<LogData>) -> Result<(), Box<dyn Error
                 + &data.process_uuid[20..];
         }
 
-        // conn.execute(
-        //     "INSERT INTO UnifiedLogs (
-        //         File, \
-        //         DecompFilePos, \
-        //         ContinuousTime, \
-        //         TimeUtc, \
-        //         Thread, \
-        //         Type, \
-        //         ActivityID, \
-        //         ParentActivityID, \
-        //         ProcessID, \
-        //         EffectiveUID, \
-        //         TTL, \
-        //         ProcessName, \
-        //         SenderName, \
-        //         Subsystem, \
-        //         Category, \
-        //         SignpostName, \
-        //         SignpostInfo, \
-        //         ImageOffset, \
-        //         SenderUUID, \
-        //         ProcessImageUUID, \
-        //         SenderImagePath, \
-        //         ProcessImagePath, \
-        //         Message
-        //         )
-        //         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23);",
-        //     params![
-        //         "".to_string(),
-        //         0,
-        //         "0".to_string(),
-        //         date_time.to_rfc3339_opts(SecondsFormat::Micros, true),
-        //         data.thread_id.to_string(),
-        //         data.log_type.to_owned(),
-        //         data.activity_id.to_string(),
-        //         0,
-        //         data.pid.to_string(),
-        //         data.euid.to_string(),
-        //         0,
-        //         process_name,
-        //         library_name,
-        //         data.subsystem.to_owned(),
-        //         data.category.to_owned(),
-        //         "".to_string(),
-        //         "".to_string(),
-        //         0,
-        //         library_uuid.to_string(),
-        //         process_uuid.to_string(),
-        //         data.library.to_owned(),
-        //         data.process.to_owned(),
-        //         data.message.to_owned()
-        //     ]
-        // )?;
-
         stmt.execute(params![
             "".to_string(),
             0.to_string(),
@@ -660,7 +596,6 @@ fn output_sqlite(path: &str, results: &Vec<LogData>) -> Result<(), Box<dyn Error
             data.message.to_owned(),
         ])?;
     }
-    // tx.commit().unwrap();
     stmt.finalize()?;
     conn.close().unwrap();
     Ok(())
@@ -677,7 +612,6 @@ fn output_csv(
         let process_name = process_path.last().unwrap().to_string();
 
         let library_path = data.library.split("/").collect::<Vec<_>>();
-        // let library_name = String::from(library_path.last().unwrap());
         let library_name = library_path.last().unwrap().to_string();
 
         let mut library_uuid = String::new();
